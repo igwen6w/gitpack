@@ -14,6 +14,8 @@
 
 set -e
 
+VERSION="3.0"
+
 # ======== 颜色定义 ========
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -23,6 +25,62 @@ NC='\033[0m'
 print_info()  { echo -e "${GREEN}[INFO]${NC} $1"; }
 print_warn()  { echo -e "${YELLOW}[WARN]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+
+# ======== 显示版本信息 ========
+show_version() {
+    echo "gitpack v${VERSION}"
+    echo "Git 文件变更打包工具"
+    exit 0
+}
+
+# ======== 显示帮助信息 ========
+show_help() {
+    cat << EOF
+gitpack v${VERSION} - Git 文件变更打包工具
+
+用法: gitpack [选项]
+
+选项:
+  --help, -h     显示此帮助信息
+  --version, -v  显示版本信息
+
+功能特性:
+  • 交互式选择 commit（支持区间选择）
+  • 支持文件匹配模式过滤（如: *.js, src/*）
+  • 自动打包变更文件（包含选中 commit 本身）
+  • 支持多种压缩格式: zip / tar.gz / tar.bz2
+  • 自动处理初始 commit 情况
+  • 支持自定义输出目录
+
+打包模式:
+  1) 从指定 commit 到 HEAD（当前版本）
+  2) 指定 commit 区间（从 commit A 到 commit B）
+
+示例:
+  gitpack              # 交互式运行
+  gitpack --help       # 显示帮助
+  gitpack --version    # 显示版本
+
+EOF
+    exit 0
+}
+
+# ======== 解析命令行参数 ========
+for arg in "$@"; do
+    case $arg in
+        --help|-h)
+            show_help
+            ;;
+        --version|-v)
+            show_version
+            ;;
+        *)
+            print_error "未知选项: $arg"
+            echo "使用 --help 查看帮助信息"
+            exit 1
+            ;;
+    esac
+done
 
 # ======== 检查Git仓库 ========
 if ! git rev-parse --git-dir > /dev/null 2>&1; then
